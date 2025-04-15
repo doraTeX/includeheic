@@ -4,57 +4,61 @@
 \RequirePackage{xstring}
 \RequirePackage{pdftexcmds}
 
-\newcount\includeimage@heiccount
-\newif\if@includeimage@heic
-\newif\if@includeimage@star
+\newcount\includeheic@heiccount
+\newif\if@includeheic@heic
+\newif\if@includeheic@star
 
-\def\includeimage@search#1{%
-  \let\@includeimage@filepath\relax
+\def\includeheic@search#1{%
+  \let\@includeheic@filepath\relax
   \ifx\Ginput@path\@undefined
-    \def\includeimage@@search@path{{}}%
+    \def\includeheic@@search@path{{}}%
   \else
-    \let\includeimage@@search@path\Ginput@path
+    \let\includeheic@@search@path\Ginput@path
   \fi
-  \def\includeimage@@search@target{#1}%
-  \expandafter\includeimage@@search\expandafter{\expandafter}\includeimage@@search@path\relax
+  \def\includeheic@@search@target{#1}%
+  \expandafter\includeheic@@search\expandafter{\expandafter}\includeheic@@search@path\relax
 }
 
-\def\includeimage@@search#1{%
+\def\includeheic@@search#1{%
   \def\@tempa{#1}%
   \def\@tempb{\relax}%
   \ifx\@tempa\@tempb
-    \let\includeimage@@@search\relax
+    \let\includeheic@@@search\relax
   \else
-    \IfFileExists{\@tempa\includeimage@@search@target}{\edef\@includeimage@filepath{\@tempa\includeimage@@search@target}}{}%
-    \let\includeimage@@@search\includeimage@@search
+    \IfFileExists{\@tempa\includeheic@@search@target}{\edef\@includeheic@filepath{\@tempa\includeheic@@search@target}}{}%
+    \let\includeheic@@@search\includeheic@@search
   \fi
-  \includeimage@@@search
+  \includeheic@@@search
 }
 %
 
-\def\includeimage{\@ifstar{\@includeimage@startrue\@includeimage}{\@includeimage@starfalse\@includeimage}}
+\let\includeheic@original\includegraphics
 
-\newcommand*\@includeimage[2][]{%
+\def\includeheic@include{\@ifstar{\@includeheic@startrue\includeheic@@include}{\@includeheic@starfalse\includeheic@@include}}
+
+\newcommand*\includeheic@@include[2][]{%
   \ifnum\pdf@shellescape=1\relax
-    \includeimage@search{#2}%
-    \ifx\@includeimage@filepath\relax
+    \includeheic@search{#2}%
+    \ifx\@includeheic@filepath\relax
       \@latex@error{File `#2' not found}\@ehc
     \fi
-    \@includeimage@heicfalse
-    \IfEndWith{\@includeimage@filepath}{.heic}{\@includeimage@heictrue}{}%
-    \IfEndWith{\@includeimage@filepath}{.HEIC}{\@includeimage@heictrue}{}%
-    \if@includeimage@heic
-      \global\advance\includeimage@heiccount\@ne
-      \edef\@includeimage@newtarget{$TMPDIR/\jobname-\the\includeimage@heiccount.jpg}%
-      \pdf@system{sips -s format jpeg \@includeimage@filepath\space --out \@includeimage@newtarget}%
-      \edef\@includeimage@filepath{\@includeimage@newtarget}%
+    \@includeheic@heicfalse
+    \IfEndWith{\@includeheic@filepath}{.heic}{\@includeheic@heictrue}{}%
+    \IfEndWith{\@includeheic@filepath}{.HEIC}{\@includeheic@heictrue}{}%
+    \if@includeheic@heic
+      \global\advance\includeheic@heiccount\@ne
+      \edef\@includeheic@newtarget{$TMPDIR/\jobname-\the\includeheic@heiccount.jpg}%
+      \pdf@system{sips -s format jpeg \@includeheic@filepath\space --out \@includeheic@newtarget}%
+      \edef\@includeheic@filepath{\@includeheic@newtarget}%
     \fi
   \else
-    \def\@includeimage@filepath{#2}%
+    \def\@includeheic@filepath{#2}%
   \fi
-  \if@includeimage@star
-    \includegraphics*[#1]{\@includeimage@filepath}%
+  \if@includeheic@star
+    \includeheic@original*[#1]{\@includeheic@filepath}%
   \else
-    \includegraphics[#1]{\@includeimage@filepath}%
+    \includeheic@original[#1]{\@includeheic@filepath}%
   \fi
 }
+
+\let\includegraphics\includeheic@include
