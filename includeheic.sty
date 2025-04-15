@@ -16,7 +16,7 @@
     \let\includeimage@@search@path\Ginput@path
   \fi
   \def\includeimage@@search@target{#1}%
-  \expandafter\includeimage@@search\includeimage@@search@path\relax
+  \expandafter\includeimage@@search\expandafter{\expandafter}\includeimage@@search@path\relax
 }
 
 \def\includeimage@@search#1{%
