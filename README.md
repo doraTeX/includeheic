@@ -30,7 +30,7 @@ See [my blog post (in Japanese)](https://doratex.hatenablog.jp/entry/20250415/17
 
 ## License
 
-This package is provided under the [LaTeX Project Public License](https://www.latex-project.org/lppl/).
+This package is provided under the Apache License 2.0.
 
 ## Author
 
