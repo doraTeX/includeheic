@@ -1,0 +1,60 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{includeheic}[2025/04/15 v0.1]
+\RequirePackage{graphicx}
+\RequirePackage{xstring}
+\RequirePackage{pdftexcmds}
+
+\newcount\includeimage@heiccount
+\newif\if@includeimage@heic
+\newif\if@includeimage@star
+
+\def\includeimage@search#1{%
+  \let\@includeimage@filepath\relax
+  \ifx\Ginput@path\@undefined
+    \def\includeimage@@search@path{{}}%
+  \else
+    \let\includeimage@@search@path\Ginput@path
+  \fi
+  \def\includeimage@@search@target{#1}%
+  \expandafter\includeimage@@search\includeimage@@search@path\relax
+}
+
+\def\includeimage@@search#1{%
+  \def\@tempa{#1}%
+  \def\@tempb{\relax}%
+  \ifx\@tempa\@tempb
+    \let\includeimage@@@search\relax
+  \else
+    \IfFileExists{\@tempa\includeimage@@search@target}{\edef\@includeimage@filepath{\@tempa\includeimage@@search@target}}{}%
+    \let\includeimage@@@search\includeimage@@search
+  \fi
+  \includeimage@@@search
+}
+%
+
+\def\includeimage{\@ifstar{\@includeimage@startrue\@includeimage}{\@includeimage@starfalse\@includeimage}}
+
+\newcommand*\@includeimage[2][]{%
+  \ifnum\pdf@shellescape=1\relax
+    \includeimage@search{#2}%
+    \ifx\@includeimage@filepath\relax
+      \@latex@error{File `#2' not found}\@ehc
+    \fi
+    \@includeimage@heicfalse
+    \IfEndWith{\@includeimage@filepath}{.heic}{\@includeimage@heictrue}{}%
+    \IfEndWith{\@includeimage@filepath}{.HEIC}{\@includeimage@heictrue}{}%
+    \if@includeimage@heic
+      \global\advance\includeimage@heiccount\@ne
+      \edef\@includeimage@newtarget{$TMPDIR/\jobname-\the\includeimage@heiccount.jpg}%
+      \pdf@system{sips -s format jpeg \@includeimage@filepath\space --out \@includeimage@newtarget}%
+      \edef\@includeimage@filepath{\@includeimage@newtarget}%
+    \fi
+  \else
+    \def\@includeimage@filepath{#2}%
+  \fi
+  \if@includeimage@star
+    \includegraphics*[#1]{\@includeimage@filepath}%
+  \else
+    \includegraphics[#1]{\@includeimage@filepath}%
+  \fi
+}
