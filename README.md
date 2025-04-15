@@ -30,7 +30,7 @@ See [my blog post (in Japanese)](https://doratex.hatenablog.jp/entry/20250415/17
 
 ## License
 
-This package is provided under the Apache License 2.0.
+This package is provided under the [MIT License](LICENSE).
 
 ## Author
 
